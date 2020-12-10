@@ -1,4 +1,4 @@
-package com.nikita.kuzmichou.task.entities;
+package com.nikita.kuzmichou.task.entities.value;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
