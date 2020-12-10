@@ -6,7 +6,7 @@ plugins {
 
 group = 'com.nikita.kuzmichou'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '15'
+sourceCompatibility = '12'
 
 def MAPSTRUCT_VERSION = '1.4.1.Final'
 

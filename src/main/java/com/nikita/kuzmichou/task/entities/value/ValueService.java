@@ -32,6 +32,11 @@ public class ValueService {
         this.repository.delete(value);
     }
 
+    @Transactional
+    public void deleteValue(final String name) {
+        this.repository.deleteById(name);
+    }
+
     @Transactional(readOnly = true)
     public List<Value> findAll() {
         return this.repository.findAll();
