@@ -2,20 +2,18 @@ package com.nikita.kuzmichou.task.entities.value;
 
 import com.nikita.kuzmichou.task.entities.value.dto.ValueDto;
 import com.nikita.kuzmichou.task.entities.value.dto.ValueMapper;
+import com.nikita.kuzmichou.task.service.calculations.CalculationService;
 import com.nikita.kuzmichou.task.service.codes.Code;
 import com.nikita.kuzmichou.task.service.codes.CodeStatus;
 import com.nikita.kuzmichou.task.service.codes.CodesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
-
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/")
@@ -23,9 +21,11 @@ public class ValueController {
     @Autowired
     private ValueService valueService;
     @Autowired
+    private CodesService codesService;
+    @Autowired
     private ValueMapper valueMapper;
     @Autowired
-    private CodesService codesService;
+    private CalculationService calculationService;
 
     @PostMapping("/add")
     public ResponseEntity<ModelAndView> addValue(@RequestBody ValueDto valueDto) {
