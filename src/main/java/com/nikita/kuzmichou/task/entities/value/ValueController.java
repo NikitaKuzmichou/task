@@ -2,6 +2,9 @@ package com.nikita.kuzmichou.task.entities.value;
 
 import com.nikita.kuzmichou.task.entities.value.dto.ValueDto;
 import com.nikita.kuzmichou.task.entities.value.dto.ValueMapper;
+import com.nikita.kuzmichou.task.service.codes.Code;
+import com.nikita.kuzmichou.task.service.codes.CodeStatus;
+import com.nikita.kuzmichou.task.service.codes.CodesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.Objects;
+
 @RestController
 @RequestMapping("/")
 public class ValueController {
@@ -19,16 +24,18 @@ public class ValueController {
     private ValueService valueService;
     @Autowired
     private ValueMapper valueMapper;
+    @Autowired
+    private CodesService codesService;
 
     @PostMapping("/add")
     public ResponseEntity<ModelAndView> addValue(@RequestBody ValueDto valueDto) {
         Value saved = this.valueService.saveValue(this.valueMapper.toValue(valueDto));
-        ModelAndView modelAndView = new ModelAndView();
+        Code respCode = this.codesService.getCodeByCodeStatus(CodeStatus.OK);
         /**TODO EXCEPTIONS & CODES GENERATION*/
-        //modelAndView.addObject("code", "");
-        //modelAndView.addObject("description", "");
-        modelAndView.addObject("saved", saved);
-        return new ResponseEntity<>(modelAndView, HttpStatus.OK);
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject("code", respCode.getCode());
+        modelAndView.addObject("description", respCode.getDescription());
+        return new ResponseEntity<>(modelAndView, respCode.getStatus());
     }
 
     @PostMapping("/remove")
