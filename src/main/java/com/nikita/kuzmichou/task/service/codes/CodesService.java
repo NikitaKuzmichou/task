@@ -10,7 +10,7 @@ public class CodesService {
             case OK:
                 return new Code(status, "OK");
             case FIELD_UNDEFINED:
-                return new Code(status, "Name or value undefined");
+                return new Code(status, "Name field undefined");
             case ALREADY_STORED:
                 return new Code(status, "Entity already stored");
             case NOT_FOUND:

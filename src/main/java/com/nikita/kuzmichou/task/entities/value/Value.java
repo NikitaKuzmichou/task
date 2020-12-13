@@ -17,4 +17,17 @@ public class Value {
     public Value() {
 
     }
+
+    public Value(String name) {
+        this.name = name;
+    }
+
+    public Value(String name, double value) {
+        this.name = name;
+        this.value = value;
+    }
+
+    public Value(double value) {
+        this.value = value;
+    }
 }

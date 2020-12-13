@@ -15,10 +15,4 @@ public class Code {
         this.code = code;
         this.description = description;
     }
-
-    @Override
-    public String toString() {
-        return "\"code\":\"" + this.code + "\",\"description\":\"" +
-                this.description + "\"";
-    }
 }
