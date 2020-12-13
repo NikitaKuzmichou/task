@@ -8,6 +8,7 @@ group = 'com.nikita.kuzmichou'
 sourceCompatibility = '12'
 
 def MAPSTRUCT_VERSION = '1.4.1.Final'
+def GSON_VERSION = '2.8.6'
 
 repositories {
 	mavenCentral()
@@ -17,6 +18,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation "org.mapstruct:mapstruct:${MAPSTRUCT_VERSION}"
+	compile group: 'com.google.code.gson', name: 'gson', version: "${GSON_VERSION}"
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'

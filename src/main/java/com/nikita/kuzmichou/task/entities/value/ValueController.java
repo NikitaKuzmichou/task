@@ -1,5 +1,6 @@
 package com.nikita.kuzmichou.task.entities.value;
 
+import com.google.gson.Gson;
 import com.nikita.kuzmichou.task.entities.value.dto.ValueDto;
 import com.nikita.kuzmichou.task.entities.value.dto.ValueMapper;
 import com.nikita.kuzmichou.task.entities.value.exceptions.AlreadyStoredException;
@@ -13,8 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 @RestController
@@ -28,6 +30,8 @@ public class ValueController {
     private ValueMapper valueMapper;
     @Autowired
     private CalculationService calculationService;
+    @Autowired
+    private Gson gson;
 
     @ExceptionHandler({AlreadyStoredException.class,
                        NotFoundException.class,
@@ -42,34 +46,36 @@ public class ValueController {
         return response;
     }
 
-
     @PostMapping("/add")
-    public ResponseEntity<ModelAndView> addValue(@RequestBody ValueDto valueDto) {
+    public ResponseEntity<Map<String, Object>> addValue(@RequestBody ValueDto valueDto) {
         if (Objects.isNull(valueDto.getName()) ||
                 valueDto.getName().isEmpty() ||
                 Double.isNaN(valueDto.getValue())) {
             Code errorCode = this.codesService.getCodeByCodeStatus(
                                                    CodeStatus.FIELD_UNDEFINED);
-            throw new UndefinedFieldException(errorCode.toString());
+            throw new UndefinedFieldException(this.gson.toJson(errorCode));
         } else if (this.valueService.getValue(valueDto.getName()).isPresent()) {
             Code errorCode = this.codesService.getCodeByCodeStatus(
                                                     CodeStatus.ALREADY_STORED);
-            throw new AlreadyStoredException(errorCode.toString());
+            throw new AlreadyStoredException(this.gson.toJson(errorCode));
         }
         this.valueService.saveValue(this.valueMapper.toValue(valueDto));
-        return new ResponseEntity<>(this.getOkModelAndView(), HttpStatus.CREATED);
+        return new ResponseEntity<>(this.okResponse(), HttpStatus.CREATED);
     }
 
     @PostMapping("/remove")
-    public ResponseEntity<ModelAndView> removeValue(@RequestBody String name) {
-        /**TODO EXCEPTIONS
-         * TODO TEST WHAT IF DELETE NOT EXISTING ELEMENT*/
+    public ResponseEntity<Map<String, Object>> removeValue(@RequestBody String name) {
+        this.valueService.getValue(name).orElseThrow(() -> {
+            Code errorCode = this.codesService.getCodeByCodeStatus(
+                                                         CodeStatus.NOT_FOUND);
+            return new NotFoundException(this.gson.toJson(errorCode));
+        });
         this.valueService.deleteValue(name);
-        return new ResponseEntity<>(this.getOkModelAndView(), HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(this.okResponse(), HttpStatus.ACCEPTED);
     }
 
     @PostMapping("/sum")
-    public ResponseEntity<ModelAndView> sumValues(@RequestBody String first,
+    public ResponseEntity<Map<String, Object>> sumValues(@RequestBody String first,
                                                   @RequestBody String second) {
         Value firstVal = this.valueService.getValue(first).orElseThrow(() -> {
             Code errorCode = this.codesService.getCodeByCodeStatus(
@@ -79,19 +85,19 @@ public class ValueController {
         Value secondVal = this.valueService.getValue(second).orElseThrow(() -> {
             Code errorCode = this.codesService.getCodeByCodeStatus(
                                                          CodeStatus.NOT_FOUND);
-            return new NotFoundException(errorCode.toString());
+            return new NotFoundException(this.gson.toJson(errorCode));
         });
-        ModelAndView modelAndView = this.getOkModelAndView();
-        modelAndView.addObject("sum",
+        Map<String, Object> response = this.okResponse();
+        response.put("sum",
                          this.calculationService.makeSum(firstVal, secondVal));
-        return new ResponseEntity<>(modelAndView, HttpStatus.OK);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    private ModelAndView getOkModelAndView() {
+    private Map<String, Object> okResponse() {
         Code respCode = this.codesService.getCodeByCodeStatus(CodeStatus.OK);
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject("code", respCode.getCode());
-        modelAndView.addObject("description", respCode.getDescription());
-        return modelAndView;
+        Map<String, Object> response = new HashMap<>();
+        response.put("code", respCode.getCode().toString());
+        response.put("description", respCode.getDescription());
+        return response;
     }
 }

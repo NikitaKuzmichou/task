@@ -18,6 +18,7 @@ public class Code {
 
     @Override
     public String toString() {
-        return "\"code\":" + this.code + ",\"description\":" + this.description;
+        return "\"code\":\"" + this.code + "\",\"description\":\"" +
+                this.description + "\"";
     }
 }
