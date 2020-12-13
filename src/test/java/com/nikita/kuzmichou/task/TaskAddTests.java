@@ -6,9 +6,6 @@ import com.nikita.kuzmichou.task.entities.value.ValueService;
 import com.nikita.kuzmichou.task.service.codes.Code;
 import com.nikita.kuzmichou.task.service.codes.CodeStatus;
 import com.nikita.kuzmichou.task.service.codes.CodesService;
-import org.aspectj.lang.annotation.Before;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +61,7 @@ class TaskAddTests {
 	void addAlreadyStoredValue() throws Exception {
 		try {
 			Value storedTest = new Value("stored", 1.0);
+			this.valueService.saveValue(storedTest);
 			Code respCode = this.codesService.getCodeByCodeStatus(CodeStatus.ALREADY_STORED);
 			this.mockMvc.perform(
 					post("/add")

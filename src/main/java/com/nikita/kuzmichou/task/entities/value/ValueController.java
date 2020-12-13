@@ -6,7 +6,7 @@ import com.nikita.kuzmichou.task.entities.value.dto.ValueMapper;
 import com.nikita.kuzmichou.task.entities.value.exceptions.AlreadyStoredException;
 import com.nikita.kuzmichou.task.entities.value.exceptions.NotFoundException;
 import com.nikita.kuzmichou.task.entities.value.exceptions.UndefinedFieldException;
-import com.nikita.kuzmichou.task.service.calculations.CalculationService;
+import com.nikita.kuzmichou.task.service.sum.SumService;
 import com.nikita.kuzmichou.task.service.codes.Code;
 import com.nikita.kuzmichou.task.service.codes.CodeStatus;
 import com.nikita.kuzmichou.task.service.codes.CodesService;
@@ -29,7 +29,7 @@ public class ValueController {
     @Autowired
     private ValueMapper valueMapper;
     @Autowired
-    private CalculationService calculationService;
+    private SumService sumService;
     @Autowired
     private Gson gson;
 
@@ -75,21 +75,24 @@ public class ValueController {
     }
 
     @PostMapping("/sum")
-    public ResponseEntity<Map<String, Object>> sumValues(@RequestBody String first,
-                                                  @RequestBody String second) {
-        Value firstVal = this.valueService.getValue(first).orElseThrow(() -> {
+    public ResponseEntity<Map<String, Object>> sumValues(
+                                                  @RequestBody String values) {
+        Map<String, String> vals = this.sumService.getValuesNames(values);
+        Value firstVal = this.valueService.getValue(vals.get("first"))
+                                                           .orElseThrow(() -> {
             Code errorCode = this.codesService.getCodeByCodeStatus(
                                                          CodeStatus.NOT_FOUND);
-            return new NotFoundException(errorCode.toString());
+            return new NotFoundException(this.gson.toJson(errorCode));
         });
-        Value secondVal = this.valueService.getValue(second).orElseThrow(() -> {
+        Value secondVal = this.valueService.getValue(vals.get("second"))
+                                                           .orElseThrow(() -> {
             Code errorCode = this.codesService.getCodeByCodeStatus(
                                                          CodeStatus.NOT_FOUND);
             return new NotFoundException(this.gson.toJson(errorCode));
         });
         Map<String, Object> response = this.okResponse();
         response.put("sum",
-                         this.calculationService.makeSum(firstVal, secondVal));
+                         this.sumService.makeSum(firstVal, secondVal));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 

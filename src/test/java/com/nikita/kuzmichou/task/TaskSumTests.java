@@ -38,10 +38,15 @@ public class TaskSumTests {
             this.valueService.saveValue(first);
             this.valueService.saveValue(second);
             Code respCode = this.codesService.getCodeByCodeStatus(CodeStatus.OK);
+            StringBuilder sb = new StringBuilder();
+            sb.append("{\"first\":\"")
+              .append(first.getName())
+              .append("\",\"second\":\"")
+              .append(second.getName())
+              .append("\"}");
             this.mockMvc.perform(
                     post("/sum")
-                            .content(first.getName())
-                            .content(second.getName())
+                            .content(sb.toString())
                             .contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())
                     .andExpect(status().isOk())
@@ -49,10 +54,8 @@ public class TaskSumTests {
                             "{" +
                                     "\"code\":\"" + respCode.getCode() + "\"," +
                                     "\"description\":\"" +
-                                               respCode.getDescription() + "\"" +
-                                    "\"sum\":\"" +
-                                           first.getValue() + second.getValue() +
-                                    "\"" +
+                                               respCode.getDescription() + "\"," +
+                                    "\"sum\":" + 2.0 +
                                     "}")));
         } finally {
             this.valueService.deleteValue("first remove test");
@@ -69,10 +72,15 @@ public class TaskSumTests {
             Value second = new Value("second remove test", 1);
             this.valueService.saveValue(first);
             Code respCode = this.codesService.getCodeByCodeStatus(CodeStatus.NOT_FOUND);
+            StringBuilder sb = new StringBuilder();
+            sb.append("{\"first\":\"")
+                    .append(first.getName())
+                    .append("\",\"second\":\"")
+                    .append(second.getName())
+                    .append("\"}");
             this.mockMvc.perform(
                     post("/sum")
-                            .content(first.getName())
-                            .content(second.getName())
+                            .content(sb.toString())
                             .contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())
                     .andExpect(status().isNotFound())
@@ -80,7 +88,7 @@ public class TaskSumTests {
                             "{" +
                                     "\"code\":\"" + respCode.getCode() + "\"," +
                                     "\"description\":\"" +
-                                              respCode.getDescription() + "\"" +
+                                    respCode.getDescription() + "\"" +
                                     "}")));
         } finally {
             this.valueService.deleteValue("first remove test");
@@ -95,10 +103,15 @@ public class TaskSumTests {
             Value second = new Value("second remove test", 1);
             this.valueService.saveValue(second);
             Code respCode = this.codesService.getCodeByCodeStatus(CodeStatus.NOT_FOUND);
+            StringBuilder sb = new StringBuilder();
+            sb.append("{\"first\":\"")
+                    .append(first.getName())
+                    .append("\",\"second\":\"")
+                    .append(second.getName())
+                    .append("\"}");
             this.mockMvc.perform(
                     post("/sum")
-                            .content(first.getName())
-                            .content(second.getName())
+                            .content(sb.toString())
                             .contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())
                     .andExpect(status().isNotFound())
@@ -119,10 +132,15 @@ public class TaskSumTests {
         Value first = new Value("first remove test", 1);
         Value second = new Value("second remove test", 1);
         Code respCode = this.codesService.getCodeByCodeStatus(CodeStatus.NOT_FOUND);
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\"first\":\"")
+                .append(first.getName())
+                .append("\",\"second\":\"")
+                .append(second.getName())
+                .append("\"}");
         this.mockMvc.perform(
                 post("/sum")
-                        .content(first.getName())
-                        .content(second.getName())
+                        .content(sb.toString())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isNotFound())
@@ -130,7 +148,7 @@ public class TaskSumTests {
                         "{" +
                                 "\"code\":\"" + respCode.getCode() + "\"," +
                                 "\"description\":\"" +
-                                respCode.getDescription() + "\"" +
+                                          respCode.getDescription() + "\"" +
                                 "}")));
     }
 }

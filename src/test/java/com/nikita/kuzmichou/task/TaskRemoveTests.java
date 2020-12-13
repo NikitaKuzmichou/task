@@ -37,6 +37,7 @@ public class TaskRemoveTests {
     void removeCorrectValue() throws Exception {
         Code respCode = this.codesService.getCodeByCodeStatus(CodeStatus.OK);
         Value testData = new Value("remove test", 1.0);
+        this.valueService.saveValue(testData);
         this.mockMvc.perform(
                 post("/remove")
                         .content(testData.getName())
@@ -57,7 +58,7 @@ public class TaskRemoveTests {
         Code respCode = this.codesService.getCodeByCodeStatus(CodeStatus.NOT_FOUND);
         this.mockMvc.perform(
                 post("/remove")
-                        .content("")
+                        .content("\"name\":\"\"")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isNotFound())
