@@ -11,15 +11,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import static org.hamcrest.Matchers.containsString;
-
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -45,12 +44,12 @@ class TaskAddTests {
 							.contentType(MediaType.APPLICATION_JSON))
 					.andDo(print())
 					.andExpect(status().isCreated())
-					.andExpect(content().string(containsString(
-							"{" +
-									"\"code\":\"" + respCode.getCode() + "\"," +
-									"\"description\":\"" +
-									respCode.getDescription() + "\"" +
-									"}")));
+					.andExpect(
+							jsonPath("$.code",
+									is(respCode.getCode().toString())))
+			        .andExpect(
+			        		jsonPath("$.description",
+									is(respCode.getDescription())));
 		} finally {
 			this.valueService.deleteValue("addTest");
 		}
@@ -70,12 +69,11 @@ class TaskAddTests {
 					.andDo(print())
 					.andExpect(status().isBadRequest())
 					.andExpect(
-							content().string(containsString(
-									"{" +
-											"\"code\":\"" + respCode.getCode() + "\"," +
-											"\"description\":\"" +
-											respCode.getDescription() + "\"" +
-											"}")));
+							jsonPath("$.code",
+									is(respCode.getCode().toString())))
+					.andExpect(
+							jsonPath("$.description",
+									is(respCode.getDescription())));
 		} finally {
 			this.valueService.deleteValue("stored");
 		}
@@ -91,12 +89,12 @@ class TaskAddTests {
 						.contentType(MediaType.APPLICATION_JSON))
 				.andDo(print())
 				.andExpect(status().isBadRequest())
-				.andExpect(content().string(containsString(
-						"{" +
-								"\"code\":\"" + respCode.getCode() + "\"," +
-								"\"description\":\"" +
-								          respCode.getDescription() + "\"" +
-								"}")));
+				.andExpect(
+						jsonPath("$.code",
+								is(respCode.getCode().toString())))
+				.andExpect(
+						jsonPath("$.description",
+								is(respCode.getDescription())));
 	}
 
 	@Test
@@ -109,11 +107,11 @@ class TaskAddTests {
 						.contentType(MediaType.APPLICATION_JSON))
 				.andDo(print())
 				.andExpect(status().isBadRequest())
-				.andExpect(content().string(containsString(
-						"{" +
-								"\"code\":\"" + respCode.getCode() + "\"," +
-								"\"description\":\"" +
-								          respCode.getDescription() + "\"" +
-								"}")));
+				.andExpect(
+						jsonPath("$.code",
+								is(respCode.getCode().toString())))
+				.andExpect(
+						jsonPath("$.description",
+								is(respCode.getDescription())));
 	}
 }

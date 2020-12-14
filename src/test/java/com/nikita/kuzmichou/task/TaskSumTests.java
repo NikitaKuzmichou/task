@@ -5,6 +5,8 @@ import com.nikita.kuzmichou.task.entities.value.ValueService;
 import com.nikita.kuzmichou.task.service.codes.Code;
 import com.nikita.kuzmichou.task.service.codes.CodeStatus;
 import com.nikita.kuzmichou.task.service.codes.CodesService;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +15,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -29,6 +31,13 @@ public class TaskSumTests {
     @Autowired
     private ValueService valueService;
 
+    private String getJsonStr(Value first, Value second) throws JSONException {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("first", first.getName());
+        jsonObject.put("second", second.getName());
+        return jsonObject.toString();
+    }
+
     @Test
     @DisplayName("Test both values names existing")
     void sumTwoCorrect() throws Exception {
@@ -38,25 +47,21 @@ public class TaskSumTests {
             this.valueService.saveValue(first);
             this.valueService.saveValue(second);
             Code respCode = this.codesService.getCodeByCodeStatus(CodeStatus.OK);
-            StringBuilder sb = new StringBuilder();
-            sb.append("{\"first\":\"")
-              .append(first.getName())
-              .append("\",\"second\":\"")
-              .append(second.getName())
-              .append("\"}");
             this.mockMvc.perform(
                     post("/sum")
-                            .content(sb.toString())
+                            .content(this.getJsonStr(first, second))
                             .contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())
                     .andExpect(status().isOk())
-                    .andExpect(content().string(containsString(
-                            "{" +
-                                    "\"code\":\"" + respCode.getCode() + "\"," +
-                                    "\"description\":\"" +
-                                               respCode.getDescription() + "\"," +
-                                    "\"sum\":" + 2.0 +
-                                    "}")));
+                    .andExpect(
+                            jsonPath("$.code",
+                                    is(respCode.getCode().toString())))
+                    .andExpect(
+                            jsonPath("$.description",
+                                    is(respCode.getDescription())))
+                    .andExpect(
+                            jsonPath("$.sum",
+                                    is(first.getValue() + second.getValue())));
         } finally {
             this.valueService.deleteValue("first remove test");
             this.valueService.deleteValue("second remove test");
@@ -72,24 +77,18 @@ public class TaskSumTests {
             Value second = new Value("second remove test", 1);
             this.valueService.saveValue(first);
             Code respCode = this.codesService.getCodeByCodeStatus(CodeStatus.NOT_FOUND);
-            StringBuilder sb = new StringBuilder();
-            sb.append("{\"first\":\"")
-                    .append(first.getName())
-                    .append("\",\"second\":\"")
-                    .append(second.getName())
-                    .append("\"}");
             this.mockMvc.perform(
                     post("/sum")
-                            .content(sb.toString())
+                            .content(this.getJsonStr(first, second))
                             .contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())
                     .andExpect(status().isNotFound())
-                    .andExpect(content().string(containsString(
-                            "{" +
-                                    "\"code\":\"" + respCode.getCode() + "\"," +
-                                    "\"description\":\"" +
-                                    respCode.getDescription() + "\"" +
-                                    "}")));
+                    .andExpect(
+                            jsonPath("$.code",
+                                    is(respCode.getCode().toString())))
+                    .andExpect(
+                            jsonPath("$.description",
+                                    is(respCode.getDescription())));
         } finally {
             this.valueService.deleteValue("first remove test");
         }
@@ -103,24 +102,18 @@ public class TaskSumTests {
             Value second = new Value("second remove test", 1);
             this.valueService.saveValue(second);
             Code respCode = this.codesService.getCodeByCodeStatus(CodeStatus.NOT_FOUND);
-            StringBuilder sb = new StringBuilder();
-            sb.append("{\"first\":\"")
-                    .append(first.getName())
-                    .append("\",\"second\":\"")
-                    .append(second.getName())
-                    .append("\"}");
             this.mockMvc.perform(
                     post("/sum")
-                            .content(sb.toString())
+                            .content(this.getJsonStr(first, second))
                             .contentType(MediaType.APPLICATION_JSON))
                     .andDo(print())
                     .andExpect(status().isNotFound())
-                    .andExpect(content().string(containsString(
-                            "{" +
-                                    "\"code\":\"" + respCode.getCode() + "\"," +
-                                    "\"description\":\"" +
-                                              respCode.getDescription() + "\"" +
-                                    "}")));
+                    .andExpect(
+                            jsonPath("$.code",
+                                    is(respCode.getCode().toString())))
+                    .andExpect(
+                            jsonPath("$.description",
+                                    is(respCode.getDescription())));
         } finally {
             this.valueService.deleteValue("second remove test");
         }
@@ -132,23 +125,17 @@ public class TaskSumTests {
         Value first = new Value("first remove test", 1);
         Value second = new Value("second remove test", 1);
         Code respCode = this.codesService.getCodeByCodeStatus(CodeStatus.NOT_FOUND);
-        StringBuilder sb = new StringBuilder();
-        sb.append("{\"first\":\"")
-                .append(first.getName())
-                .append("\",\"second\":\"")
-                .append(second.getName())
-                .append("\"}");
         this.mockMvc.perform(
                 post("/sum")
-                        .content(sb.toString())
+                        .content(this.getJsonStr(first, second))
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isNotFound())
-                .andExpect(content().string(containsString(
-                        "{" +
-                                "\"code\":\"" + respCode.getCode() + "\"," +
-                                "\"description\":\"" +
-                                          respCode.getDescription() + "\"" +
-                                "}")));
+                .andExpect(
+                        jsonPath("$.code",
+                                is(respCode.getCode().toString())))
+                .andExpect(
+                        jsonPath("$.description",
+                                is(respCode.getDescription())));
     }
 }
