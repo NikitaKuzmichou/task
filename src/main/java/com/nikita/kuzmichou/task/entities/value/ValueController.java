@@ -47,7 +47,8 @@ public class ValueController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Map<String, Object>> addValue(@RequestBody ValueDto valueDto) {
+    public ResponseEntity<Map<String, Object>> addValue(
+                                              @RequestBody ValueDto valueDto) {
         if (Objects.isNull(valueDto.getName()) ||
                 valueDto.getName().isEmpty() ||
                 Double.isNaN(valueDto.getValue())) {
@@ -64,7 +65,10 @@ public class ValueController {
     }
 
     @PostMapping("/remove")
-    public ResponseEntity<Map<String, Object>> removeValue(@RequestBody String name) {
+    public ResponseEntity<Map<String, Object>> removeValue(
+                                                @RequestBody String jsonName) {
+        String name = this.gson.fromJson(jsonName, Map.class)
+                                                       .get("name").toString();
         this.valueService.getValue(name).orElseThrow(() -> {
             Code errorCode = this.codesService.getCodeByCodeStatus(
                                                          CodeStatus.NOT_FOUND);
@@ -91,8 +95,7 @@ public class ValueController {
             return new NotFoundException(this.gson.toJson(errorCode));
         });
         Map<String, Object> response = this.okResponse();
-        response.put("sum",
-                         this.sumService.makeSum(firstVal, secondVal));
+        response.put("sum", this.sumService.makeSum(firstVal, secondVal));
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
