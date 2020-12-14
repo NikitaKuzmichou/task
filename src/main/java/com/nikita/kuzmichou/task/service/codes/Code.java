@@ -1,18 +1,14 @@
 package com.nikita.kuzmichou.task.service.codes;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class Code {
     private CodeStatus code;
     private String description;
-
-    public Code() {
-
-    }
-
-    public Code(CodeStatus code, String description) {
-        this.code = code;
-        this.description = description;
-    }
 }
