@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -14,6 +15,9 @@ public class ValueService {
 
     @Transactional(readOnly = true)
     public Optional<Value> getValue(final String name) {
+        if (Objects.isNull(name)) {
+            return Optional.empty();
+        }
         return this.repository.findById(name);
     }
 

@@ -50,8 +50,8 @@ public class ValueController {
     public ResponseEntity<Map<String, Object>> addValue(
                                               @RequestBody ValueDto valueDto) {
         if (Objects.isNull(valueDto.getName()) ||
-                valueDto.getName().isEmpty() ||
-                Double.isNaN(valueDto.getValue())) {
+                  valueDto.getName().isEmpty() ||
+                  Double.isNaN(valueDto.getValue())) {
             Code errorCode = this.codesService.getCodeByCodeStatus(
                                                    CodeStatus.FIELD_UNDEFINED);
             throw new UndefinedFieldException(this.gson.toJson(errorCode));
@@ -67,14 +67,13 @@ public class ValueController {
     @PostMapping("/remove")
     public ResponseEntity<Map<String, Object>> removeValue(
                                                 @RequestBody String jsonName) {
-        String name = this.gson.fromJson(jsonName, Map.class)
-                                                       .get("name").toString();
-        this.valueService.getValue(name).orElseThrow(() -> {
+        Value value = this.gson.fromJson(jsonName, Value.class);
+        this.valueService.getValue(value.getName()).orElseThrow(() -> {
             Code errorCode = this.codesService.getCodeByCodeStatus(
                                                          CodeStatus.NOT_FOUND);
             return new NotFoundException(this.gson.toJson(errorCode));
         });
-        this.valueService.deleteValue(name);
+        this.valueService.deleteValue(value);
         return new ResponseEntity<>(this.okResponse(), HttpStatus.ACCEPTED);
     }
 
