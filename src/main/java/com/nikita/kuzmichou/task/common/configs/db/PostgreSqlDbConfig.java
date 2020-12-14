@@ -5,8 +5,9 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import java.util.Properties;
 
-public class PostgreSqlDbConfig {
+public class PostgreSqlDbConfig implements DbConfiguration{
     @Bean
+    @Override
     public DriverManagerDataSource dataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("org.postgresql.Driver");
@@ -15,6 +16,11 @@ public class PostgreSqlDbConfig {
         dataSource.setPassword("root");
         dataSource.setConnectionProperties(this.getConnectionProperties());
         return dataSource;
+    }
+
+    @Override
+    public String dialect() {
+        return "org.hibernate.dialect.PostgreSQL92Dialect";
     }
 
     private Properties getConnectionProperties() {

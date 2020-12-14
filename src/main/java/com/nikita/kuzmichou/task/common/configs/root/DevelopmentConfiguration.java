@@ -1,5 +1,7 @@
 package com.nikita.kuzmichou.task.common.configs.root;
 
+import com.nikita.kuzmichou.task.common.configs.db.DbConfiguration;
+import com.nikita.kuzmichou.task.common.configs.db.H2DbConfig;
 import com.nikita.kuzmichou.task.common.configs.db.PostgreSqlDbConfig;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,7 +16,7 @@ import java.util.Properties;
 @Configuration
 @EnableTransactionManagement
 public class DevelopmentConfiguration {
-    private PostgreSqlDbConfig postgreConfig = new PostgreSqlDbConfig();
+    private DbConfiguration dbConfig = new H2DbConfig();
 
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(
@@ -33,14 +35,13 @@ public class DevelopmentConfiguration {
 
     @Bean
     public DriverManagerDataSource dataSource() {
-        DriverManagerDataSource dataSource = this.postgreConfig.dataSource();
+        DriverManagerDataSource dataSource = this.dbConfig.dataSource();
         return dataSource;
     }
 
     private Properties getJpaProperties() {
         Properties props = new Properties();
-        props.setProperty("hibernate.dialect",
-                          "org.hibernate.dialect.PostgreSQL92Dialect");
+        props.setProperty("hibernate.dialect", this.dbConfig.dialect());
         props.setProperty("spring.jpa.hibernate.ddl-auto", "update");
         props.setProperty("hibernate.show_sql", "true");
         props.setProperty("hibernate.format_sql", "true");
